@@ -1,0 +1,114 @@
+﻿@using Practyca02_04_2023.Controllers;
+@using Practyca02_04_2023.Models;
+@model Practyca02_04_2023.Models.TaskList;
+@{
+    ViewData["Title"] = "List";
+    List <Practyca02_04_2023.Models.Task> tasks = new List<Practyca02_04_2023.Models.Task>();
+   
+
+}
+
+<h1>List</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<div class="form-check">
+    <input class="form-check-input" type="radio" name="flexRadioDefault" id="Radio1" onchange="CheckAll()" checked>
+    <label class="form-check-label" for="flexRadioDefault1">
+        Всі
+    </label>
+</div>
+<div class="form-check">
+    <input class="form-check-input" type="radio" name="flexRadioDefault" id="Radio2" onchange="CheckAll()">
+    <label class="form-check-label" for="flexRadioDefault2">
+        Виконані
+    </label>
+</div>
+<div class="form-check">
+    <input class="form-check-input" type="radio" name="flexRadioDefault" id="Radio3" onchange="CheckAll()">
+    <label class="form-check-label" for="flexRadioDefault3">
+        Невиконані
+    </label>
+</div>
+<table class="table">
+    <thead>
+
+        <tr>
+            <th>
+                Status
+            </th>
+            <th>
+                Name
+            </th>
+            <th>
+                Description
+            </th>
+            
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Tasks)
+        {
+            <tr>
+                <td>
+                        @if (item.Status)
+                        {
+                            <input type="checkbox" name="status" id="status{@item.Id}" class="form-check-input" onchange="UpdateCustomer(this, @item.Id)" checked/>
+                        }
+                        else{
+                            <input type="checkbox" name="status" id="status{@item.Id}" class="form-check-input" onchange="UpdateCustomer(this, @item.Id)"/>
+                        }
+                </td>
+            <td>
+            
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+               
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
+                    @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<script>
+    function CheckAll() {
+        var ch = 1;
+        if ($("#Radio1").is(':checked')) {
+            ch = 1;
+        }
+        else if ($("#Radio2").is(':checked')) {
+            ch = 2;
+        }
+                else if ($("#Radio3").is(':checked')) {
+            ch = 3;
+        }
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("ShowFilter", "Task")',
+            data: { check: ch },
+            success: function (res) {
+                console.log(res);
+            }
+        });
+    }
+    function UpdateCustomer(elem, id) {
+        var isDone = $(elem).is(':checked');
+        
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("StatusChange", "Task")',
+            data: { check: isDone, id: id },
+            success: function (res) {
+                console.log(res);
+            }
+        });
+    }
+    
+</script>
